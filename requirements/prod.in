@@ -1,0 +1,4 @@
+-r base.in
+
+psycopg2
+gunicorn

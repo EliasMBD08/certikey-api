@@ -1,0 +1,8 @@
+-r base.in
+
+psycopg2-binary
+pip-tools
+
+pytest
+pytest-django
+coverage

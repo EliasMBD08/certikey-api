@@ -1,0 +1,84 @@
+# --- Entornos Virtuales ---
+.venv/
+venv/
+env/
+ENV/
+bin/
+lib/
+include/
+share/
+pyvenv.cfg
+pip-selfcheck.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints
+
+# --- Variables de Entorno (¡IMPORTANTE!) ---
+.env
+.env.production
+.venv
+env.ini
+.secrets
+*.local
+
+# --- Bases de Datos ---
+*.sqlite3
+*.db
+
+# --- Testing / Cobertura ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# --- Logs ---
+*.log
+local_settings.py
+
+# --- Herramientas de Type Checking / Linting ---
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.staticconf
+.ruff_cache/
+
+# --- Configuración de IDEs (Opcional) ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
