@@ -1,7 +1,9 @@
 from django.db import models
 
+from apps.shared.infrastructure.models import ModeloBase
 
-class Programa(models.Model):
+
+class Programa(ModeloBase):
     certificadora = models.ForeignKey(
         "usuarios.PerfilCertificadora",
         on_delete=models.CASCADE,
@@ -63,9 +65,6 @@ class Programa(models.Model):
     fecha_fin = models.DateField(null=True, blank=True)
     inscripciones_abiertas = models.BooleanField(default=True)
     url_inscripcion = models.URLField(blank=True)
-
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Programa"

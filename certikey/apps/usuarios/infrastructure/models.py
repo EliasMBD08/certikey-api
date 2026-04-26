@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from apps.shared.infrastructure.models import ModeloBase
+
 
 class Usuario(AbstractUser):
     rol = models.ForeignKey(
@@ -27,7 +29,7 @@ class Usuario(AbstractUser):
         return self.rol and self.rol.slug == "estudiante"
 
 
-class PerfilEstudiante(models.Model):
+class PerfilEstudiante(ModeloBase):
     usuario = models.OneToOneField(
         Usuario, on_delete=models.CASCADE, related_name="perfil_estudiante"
     )
@@ -42,13 +44,12 @@ class PerfilEstudiante(models.Model):
     areas_interes = models.ManyToManyField(
         "catalogos.Categoria", blank=True, related_name="estudiantes_interesados"
     )
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Perfil de Estudiante"
 
 
-class PerfilCertificadora(models.Model):
+class PerfilCertificadora(ModeloBase):
     usuario = models.OneToOneField(
         Usuario, on_delete=models.CASCADE, related_name="perfil_certificadora"
     )
@@ -70,7 +71,6 @@ class PerfilCertificadora(models.Model):
         null=True,
         related_name="certificadoras",
     )
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_verificacion = models.DateTimeField(null=True, blank=True)
 
     class Meta:

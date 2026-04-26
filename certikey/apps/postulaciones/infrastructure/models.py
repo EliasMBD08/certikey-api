@@ -1,7 +1,9 @@
 from django.db import models
 
+from apps.shared.infrastructure.models import ModeloBase
 
-class Postulacion(models.Model):
+
+class Postulacion(ModeloBase):
     estudiante = models.ForeignKey(
         "usuarios.PerfilEstudiante",
         on_delete=models.CASCADE,
@@ -19,7 +21,6 @@ class Postulacion(models.Model):
     )
     mensaje = models.TextField(blank=True)
     fecha_postulacion = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Postulación"

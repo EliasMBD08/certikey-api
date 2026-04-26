@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_filters',
     # Local apps (order matters: catalogos first, then usuarios, then the rest)
+    'apps.shared',
     'apps.catalogos',
     'apps.usuarios',
     'apps.programas',
