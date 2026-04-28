@@ -82,3 +82,6 @@ dmypy.json
 *.swo
 *~
 .DS_Store
+
+# --- Git Worktrees ---
+.worktrees/
