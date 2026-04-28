@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from apps.programas.domain.repositories.programa_repository import AbstractProgramaRepository
 from apps.programas.domain.entities.programa import ProgramaEntity
-from apps.programas.domain.exceptions import ProgramaNotFound, AccesoDenegado
+from apps.programas.domain.exceptions import ProgramaNotFound, AccesoDenegado, CategoriasExcedidas
+
+MAX_CATEGORIAS = 5
 
 
 @dataclass
@@ -14,7 +16,7 @@ class UpdateProgramaInput:
     precio: float | None = None
     es_gratuito: bool | None = None
     inscripciones_abiertas: bool | None = None
-    categoria_id: int | None = None
+    categorias_ids: list[int] | None = None
     nivel_id: int | None = None
     moneda_id: int | None = None
     duracion_horas: int | None = None
@@ -34,6 +36,11 @@ class UpdateProgramaUseCase:
 
         if programa.certificadora_id != input_dto.certificadora_id:
             raise AccesoDenegado("No tienes permiso para editar este programa.")
+
+        if input_dto.categorias_ids is not None and len(input_dto.categorias_ids) > MAX_CATEGORIAS:
+            raise CategoriasExcedidas(
+                f"Un programa no puede tener más de {MAX_CATEGORIAS} categorías."
+            )
 
         kwargs = {
             k: v for k, v in vars(input_dto).items()

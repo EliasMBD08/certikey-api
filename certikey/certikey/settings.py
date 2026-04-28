@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'apps.usuarios',
     'apps.programas',
     'apps.postulaciones',
+    'apps.resenas',
 ]
 
 MIDDLEWARE = [

@@ -12,3 +12,7 @@ class ProgramaYaPublicado(Exception):
 
 class AccesoDenegado(Exception):
     pass
+
+
+class CategoriasExcedidas(Exception):
+    pass

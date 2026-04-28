@@ -9,6 +9,7 @@ class DjangoProgramaRepository(AbstractProgramaRepository):
         from apps.catalogos.infrastructure.models import EstadoPrograma
 
         tags_ids = kwargs.pop('tags_ids', [])
+        categorias_ids = kwargs.pop('categorias_ids', [])
         estado_borrador = EstadoPrograma.objects.get(slug='borrador')
 
         programa = Programa.objects.create(
@@ -18,12 +19,14 @@ class DjangoProgramaRepository(AbstractProgramaRepository):
         )
         if tags_ids:
             programa.tags.set(tags_ids)
+        if categorias_ids:
+            programa.categorias.set(categorias_ids)
         return self._to_entity(programa)
 
     def get_by_id(self, programa_id):
         from apps.programas.infrastructure.models import Programa
         try:
-            p = Programa.objects.select_related('estado').prefetch_related('tags').get(id=programa_id)
+            p = Programa.objects.select_related('estado').prefetch_related('tags', 'categorias').get(id=programa_id)
         except Programa.DoesNotExist:
             raise ProgramaNotFound(f"Programa {programa_id} no encontrado.")
         return self._to_entity(p)
@@ -31,7 +34,7 @@ class DjangoProgramaRepository(AbstractProgramaRepository):
     def get_by_slug(self, slug):
         from apps.programas.infrastructure.models import Programa
         try:
-            p = Programa.objects.select_related('estado').prefetch_related('tags').get(slug=slug)
+            p = Programa.objects.select_related('estado').prefetch_related('tags', 'categorias').get(slug=slug)
         except Programa.DoesNotExist:
             raise ProgramaNotFound(f"Programa '{slug}' no encontrado.")
         return self._to_entity(p)
@@ -40,10 +43,10 @@ class DjangoProgramaRepository(AbstractProgramaRepository):
         from apps.programas.infrastructure.models import Programa
         qs = Programa.objects.filter(
             estado__es_visible_publico=True
-        ).select_related('estado', 'tipo', 'modalidad', 'categoria', 'certificadora__usuario').prefetch_related('tags')
+        ).select_related('estado', 'tipo', 'modalidad', 'certificadora__usuario').prefetch_related('tags', 'categorias')
 
-        if filters.get('categoria'):
-            qs = qs.filter(categoria_id=filters['categoria'])
+        if filters.get('categorias'):
+            qs = qs.filter(categorias__id__in=filters['categorias']).distinct()
         if filters.get('tipo'):
             qs = qs.filter(tipo_id=filters['tipo'])
         if filters.get('modalidad'):
@@ -63,16 +66,19 @@ class DjangoProgramaRepository(AbstractProgramaRepository):
 
     def list_by_certificadora(self, certificadora_id):
         from apps.programas.infrastructure.models import Programa
-        qs = Programa.objects.filter(certificadora_id=certificadora_id).select_related('estado').prefetch_related('tags')
+        qs = Programa.objects.filter(certificadora_id=certificadora_id).select_related('estado').prefetch_related('tags', 'categorias')
         return [self._to_entity(p) for p in qs]
 
     def update(self, programa_id, **kwargs):
         from apps.programas.infrastructure.models import Programa
         tags_ids = kwargs.pop('tags_ids', None)
+        categorias_ids = kwargs.pop('categorias_ids', None)
         Programa.objects.filter(id=programa_id).update(**kwargs)
-        programa = Programa.objects.select_related('estado').prefetch_related('tags').get(id=programa_id)
+        programa = Programa.objects.select_related('estado').prefetch_related('tags', 'categorias').get(id=programa_id)
         if tags_ids is not None:
             programa.tags.set(tags_ids)
+        if categorias_ids is not None:
+            programa.categorias.set(categorias_ids)
         return self._to_entity(programa)
 
     def update_estado(self, programa_id, estado_slug):
@@ -80,7 +86,7 @@ class DjangoProgramaRepository(AbstractProgramaRepository):
         from apps.catalogos.infrastructure.models import EstadoPrograma
         estado = EstadoPrograma.objects.get(slug=estado_slug)
         Programa.objects.filter(id=programa_id).update(estado=estado)
-        programa = Programa.objects.select_related('estado').prefetch_related('tags').get(id=programa_id)
+        programa = Programa.objects.select_related('estado').prefetch_related('tags', 'categorias').get(id=programa_id)
         return self._to_entity(programa)
 
     def _to_entity(self, p) -> ProgramaEntity:
@@ -91,7 +97,7 @@ class DjangoProgramaRepository(AbstractProgramaRepository):
             descripcion_corta=p.descripcion_corta,
             descripcion=p.descripcion,
             certificadora_id=p.certificadora_id,
-            categoria_id=p.categoria_id,
+            categorias_ids=list(p.categorias.values_list('id', flat=True)),
             tipo_id=p.tipo_id,
             modalidad_id=p.modalidad_id,
             nivel_id=p.nivel_id,

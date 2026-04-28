@@ -3,7 +3,9 @@ from decimal import Decimal
 
 from apps.programas.domain.repositories.programa_repository import AbstractProgramaRepository
 from apps.programas.domain.entities.programa import ProgramaEntity
-from apps.programas.domain.exceptions import CertificadoraNoVerificada
+from apps.programas.domain.exceptions import CertificadoraNoVerificada, CategoriasExcedidas
+
+MAX_CATEGORIAS = 5
 
 
 @dataclass
@@ -17,7 +19,7 @@ class CreateProgramaInput:
     tipo_id: int
     modalidad_id: int
     es_gratuito: bool
-    categoria_id: int | None = None
+    categorias_ids: list[int] = field(default_factory=list)
     nivel_id: int | None = None
     precio: Decimal | None = None
     moneda_id: int | None = None
@@ -40,6 +42,10 @@ class CreateProgramaUseCase:
         if not input_dto.puede_publicar:
             raise CertificadoraNoVerificada(
                 "La certificadora no está verificada y no puede crear programas."
+            )
+        if len(input_dto.categorias_ids) > MAX_CATEGORIAS:
+            raise CategoriasExcedidas(
+                f"Un programa no puede tener más de {MAX_CATEGORIAS} categorías."
             )
 
         kwargs = {k: v for k, v in vars(input_dto).items()

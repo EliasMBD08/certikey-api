@@ -8,7 +8,12 @@ class ProgramaSerializer(serializers.Serializer):
     descripcion_corta = serializers.CharField(max_length=300)
     descripcion = serializers.CharField()
     certificadora_id = serializers.IntegerField(read_only=True)
-    categoria_id = serializers.IntegerField(allow_null=True, required=False)
+    categorias_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        default=list,
+        max_length=5,
+    )
     tipo_id = serializers.IntegerField()
     modalidad_id = serializers.IntegerField()
     nivel_id = serializers.IntegerField(allow_null=True, required=False)
@@ -32,7 +37,11 @@ class ProgramaUpdateSerializer(serializers.Serializer):
     titulo = serializers.CharField(max_length=255, required=False)
     descripcion_corta = serializers.CharField(max_length=300, required=False)
     descripcion = serializers.CharField(required=False)
-    categoria_id = serializers.IntegerField(allow_null=True, required=False)
+    categorias_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        max_length=5,
+    )
     nivel_id = serializers.IntegerField(allow_null=True, required=False)
     es_gratuito = serializers.BooleanField(required=False)
     precio = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True, required=False)
