@@ -6,6 +6,10 @@ from apps.catalogos.infrastructure.models import (
 
 
 class Command(BaseCommand):
+    """
+    Comando para poblar los catálogos iniciales necesarios para el funcionamiento del sistema.
+    Se puede ejecutar con: python manage.py seed_catalogos
+    """
     help = 'Pobla los catálogos iniciales necesarios para el funcionamiento del sistema.'
 
     def handle(self, *args, **options):
