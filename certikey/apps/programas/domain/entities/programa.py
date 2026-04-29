@@ -17,7 +17,7 @@ class ProgramaEntity:
     es_gratuito: bool
     inscripciones_abiertas: bool
     fecha_creacion: datetime
-    categoria_id: int | None = None
+    categorias_ids: list[int] = field(default_factory=list)
     nivel_id: int | None = None
     precio: Decimal | None = None
     moneda_id: int | None = None

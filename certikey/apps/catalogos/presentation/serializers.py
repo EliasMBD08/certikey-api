@@ -2,7 +2,7 @@ from rest_framework import serializers
 from apps.catalogos.infrastructure.models import (
     Pais, Ciudad, Moneda, Rol, TipoPrograma, Modalidad,
     NivelAcademico, EstadoPrograma, EstadoVerificacion,
-    EstadoPostulacion, Categoria, Tag,
+    Categoria, Tag,
 )
 
 
@@ -60,12 +60,6 @@ class EstadoVerificacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = EstadoVerificacion
         fields = ['id', 'nombre', 'slug']
-
-
-class EstadoPostulacionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EstadoPostulacion
-        fields = ['id', 'nombre', 'slug', 'descripcion']
 
 
 class CategoriaSerializer(serializers.ModelSerializer):

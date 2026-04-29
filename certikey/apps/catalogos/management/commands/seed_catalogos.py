@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from apps.catalogos.infrastructure.models import (
-    Rol, EstadoVerificacion, EstadoPrograma, EstadoPostulacion,
+    Rol, EstadoVerificacion, EstadoPrograma,
     TipoPrograma, Modalidad, NivelAcademico, Moneda,
 )
 
@@ -16,7 +16,6 @@ class Command(BaseCommand):
         self._seed_roles()
         self._seed_estados_verificacion()
         self._seed_estados_programa()
-        self._seed_estados_postulacion()
         self._seed_tipos_programa()
         self._seed_modalidades()
         self._seed_niveles()
@@ -53,17 +52,6 @@ class Command(BaseCommand):
         for d in datos:
             EstadoPrograma.objects.get_or_create(slug=d['slug'], defaults=d)
         self.stdout.write('  ✓ Estados de programa')
-
-    def _seed_estados_postulacion(self):
-        datos = [
-            {'nombre': 'Guardado', 'slug': 'guardado', 'es_estado_final': False},
-            {'nombre': 'Contactado', 'slug': 'contactado', 'es_estado_final': False},
-            {'nombre': 'Inscrito', 'slug': 'inscrito', 'es_estado_final': True},
-            {'nombre': 'Cancelado', 'slug': 'cancelado', 'es_estado_final': True},
-        ]
-        for d in datos:
-            EstadoPostulacion.objects.get_or_create(slug=d['slug'], defaults=d)
-        self.stdout.write('  ✓ Estados de postulación')
 
     def _seed_tipos_programa(self):
         nombres = ['Curso', 'Diplomado', 'Carrera Técnica', 'Carrera Universitaria', 'Bootcamp', 'Certificación']

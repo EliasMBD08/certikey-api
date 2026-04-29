@@ -13,7 +13,7 @@ from apps.programas.application.use_cases.publish_programa import PublishProgram
 from apps.programas.infrastructure.repositories.django_programa_repository import DjangoProgramaRepository
 from apps.programas.presentation.serializers.programa_serializer import ProgramaSerializer, ProgramaUpdateSerializer
 from apps.programas.domain.exceptions import (
-    ProgramaNotFound, CertificadoraNoVerificada, ProgramaYaPublicado, AccesoDenegado,
+    ProgramaNotFound, CertificadoraNoVerificada, ProgramaYaPublicado, AccesoDenegado, CategoriasExcedidas,
 )
 from apps.usuarios.presentation.permissions import IsCertificadora
 
@@ -30,7 +30,7 @@ class ProgramaViewSet(ViewSet):
 
     def list(self, request):
         filters = {
-            'categoria': request.query_params.get('categoria'),
+            'categorias': request.query_params.getlist('categorias'),
             'tipo': request.query_params.get('tipo'),
             'modalidad': request.query_params.get('modalidad'),
             'nivel': request.query_params.get('nivel'),
@@ -63,6 +63,8 @@ class ProgramaViewSet(ViewSet):
             programa = CreateProgramaUseCase(_repo()).execute(input_dto)
         except CertificadoraNoVerificada as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+        except CategoriasExcedidas as e:
+            return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         return Response(asdict(programa), status=status.HTTP_201_CREATED)
 
@@ -82,6 +84,8 @@ class ProgramaViewSet(ViewSet):
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except AccesoDenegado as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+        except CategoriasExcedidas as e:
+            return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         return Response(asdict(programa))
 

@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     'apps.catalogos',
     'apps.usuarios',
     'apps.programas',
-    'apps.postulaciones',
+    'apps.intereses',
+    'apps.resenas',
 ]
 
 MIDDLEWARE = [
