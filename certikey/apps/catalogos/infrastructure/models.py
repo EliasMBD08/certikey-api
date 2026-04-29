@@ -115,19 +115,6 @@ class EstadoVerificacion(models.Model):
         return self.nombre
 
 
-class EstadoPostulacion(models.Model):
-    nombre = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True)
-    descripcion = models.CharField(max_length=255, blank=True)
-    es_estado_final = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = "Estado de Postulación"
-
-    def __str__(self):
-        return self.nombre
-
-
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)

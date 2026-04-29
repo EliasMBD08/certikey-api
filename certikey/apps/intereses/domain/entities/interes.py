@@ -3,10 +3,9 @@ from datetime import datetime
 
 
 @dataclass
-class PostulacionEntity:
+class InteresEntity:
     id: int
     estudiante_id: int
     programa_id: int
-    estado_slug: str
-    mensaje: str
-    fecha_postulacion: datetime
+    fecha_creacion: datetime
+    activo: bool = True
