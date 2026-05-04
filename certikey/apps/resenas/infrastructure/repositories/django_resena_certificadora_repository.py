@@ -1,16 +1,23 @@
+from django.db import transaction, IntegrityError
+
 from apps.resenas.domain.repositories.resena_certificadora_repository import AbstractResenaCertificadoraRepository
 from apps.resenas.domain.entities.resena_certificadora import ResenaCertificadoraEntity
+from apps.resenas.domain.exceptions import ResenaYaExiste
 
 
 class DjangoResenaCertificadoraRepository(AbstractResenaCertificadoraRepository):
+    @transaction.atomic
     def create(self, estudiante_id, certificadora_id, calificacion, comentario):
         from apps.resenas.infrastructure.models import ResenaCertificadora
-        r = ResenaCertificadora.objects.create(
-            estudiante_id=estudiante_id,
-            certificadora_id=certificadora_id,
-            calificacion=calificacion,
-            comentario=comentario,
-        )
+        try:
+            r = ResenaCertificadora.objects.create(
+                estudiante_id=estudiante_id,
+                certificadora_id=certificadora_id,
+                calificacion=calificacion,
+                comentario=comentario,
+            )
+        except IntegrityError:
+            raise ResenaYaExiste("Ya tienes una reseña para esta certificadora.")
         return self._to_entity(r)
 
     def list_by_certificadora(self, certificadora_id):

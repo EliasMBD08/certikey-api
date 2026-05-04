@@ -1,11 +1,14 @@
+from django.db import transaction, IntegrityError
+
 from apps.usuarios.domain.repositories.user_repository import AbstractUserRepository
 from apps.usuarios.domain.entities.user import UserEntity
 from apps.usuarios.domain.entities.perfil_estudiante import PerfilEstudianteEntity
 from apps.usuarios.domain.entities.perfil_certificadora import PerfilCertificadoraEntity
-from apps.usuarios.domain.exceptions import RolNotFound, InvalidRole, UserNotFound, PerfilNotFound
+from apps.usuarios.domain.exceptions import RolNotFound, InvalidRole, UserNotFound, PerfilNotFound, EmailAlreadyExists
 
 
 class DjangoUserRepository(AbstractUserRepository):
+    @transaction.atomic
     def create(self, email, username, password, first_name, last_name, rol_slug):
         from apps.usuarios.infrastructure.models import Usuario
         from apps.catalogos.infrastructure.models import Rol
@@ -18,14 +21,17 @@ class DjangoUserRepository(AbstractUserRepository):
         if not rol.es_publico:
             raise InvalidRole(f"El rol '{rol_slug}' no está disponible para registro.")
 
-        user = Usuario.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            rol=rol,
-        )
+        try:
+            user = Usuario.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                rol=rol,
+            )
+        except IntegrityError:
+            raise EmailAlreadyExists(f"El email '{email}' ya está registrado.")
         return self._user_to_entity(user)
 
     def get_by_id(self, user_id):
@@ -56,6 +62,7 @@ class DjangoUserRepository(AbstractUserRepository):
             raise PerfilNotFound(f"Perfil de certificadora para usuario {usuario_id} no encontrado.")
         return self._certificadora_to_entity(perfil)
 
+    @transaction.atomic
     def update_perfil_estudiante(self, usuario_id, **kwargs):
         from apps.usuarios.infrastructure.models import PerfilEstudiante
         areas_interes_ids = kwargs.pop('areas_interes_ids', None)

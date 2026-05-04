@@ -178,10 +178,15 @@ Todos los endpoints de catálogos son **solo lectura** (`GET list` y `GET detail
 ### `GET /catalogos/paises/`
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Perú", "codigo_iso": "PER" },
-  { "id": 2, "nombre": "Colombia", "codigo_iso": "COL" }
-]
+{
+  "count": 50,
+  "next": "http://localhost:8000/api/v1/catalogos/paises/?page=3",
+  "previous": "http://localhost:8000/api/v1/catalogos/paises/?page=1",
+  "results": [
+    { "id": 1, "nombre": "Perú", "codigo_iso": "PER" },
+    { "id": 2, "nombre": "Colombia", "codigo_iso": "COL" }
+  ]
+}
 ```
 
 ### `GET /catalogos/paises/{id}/`
@@ -196,9 +201,14 @@ Query params: `?pais=<id>` (filtro por país)
 
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Lima", "pais": 1, "pais_nombre": "Perú" }
-]
+{
+  "count": 120,
+  "next": "http://localhost:8000/api/v1/catalogos/ciudades/?page=3",
+  "previous": "http://localhost:8000/api/v1/catalogos/ciudades/?page=1",
+  "results": [
+    { "id": 1, "nombre": "Lima", "pais": 1, "pais_nombre": "Perú" }
+  ]
+}
 ```
 
 ### `GET /catalogos/ciudades/{id}/`
@@ -211,9 +221,14 @@ Query params: `?pais=<id>` (filtro por país)
 ### `GET /catalogos/monedas/`
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Sol Peruano", "codigo_iso": "PEN", "simbolo": "S/" }
-]
+{
+  "count": 25,
+  "next": "http://localhost:8000/api/v1/catalogos/monedas/?page=2",
+  "previous": null,
+  "results": [
+    { "id": 1, "nombre": "Sol Peruano", "codigo_iso": "PEN", "simbolo": "S/" }
+  ]
+}
 ```
 
 ---
@@ -223,10 +238,16 @@ Solo roles con `es_publico=true`.
 
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Estudiante", "slug": "estudiante", "descripcion": "" },
-  { "id": 2, "nombre": "Certificadora", "slug": "certificadora", "descripcion": "" }
-]
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    { "id": 1, "nombre": "Estudiante", "slug": "estudiante", "descripcion": "" },
+    { "id": 2, "nombre": "Certificadora", "slug": "certificadora", "descripcion": "" }
+  ]
+}
+> `next` y `previous` son `null` cuando no hay más páginas.
 ```
 
 ---
@@ -236,9 +257,14 @@ Solo tipos con `activo=true`.
 
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Bootcamp", "slug": "bootcamp", "descripcion": "" }
-]
+{
+  "count": 5,
+  "next": "http://localhost:8000/api/v1/catalogos/tipos-programa/?page=2",
+  "previous": null,
+  "results": [
+    { "id": 1, "nombre": "Bootcamp", "slug": "bootcamp", "descripcion": "" }
+  ]
+}
 ```
 
 ---
@@ -246,9 +272,14 @@ Solo tipos con `activo=true`.
 ### `GET /catalogos/modalidades/`
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Virtual", "slug": "virtual", "descripcion": "" }
-]
+{
+  "count": 3,
+  "next": null,
+  "previous": null,
+  "results": [
+    { "id": 1, "nombre": "Virtual", "slug": "virtual", "descripcion": "" }
+  ]
+}
 ```
 
 ---
@@ -256,9 +287,14 @@ Solo tipos con `activo=true`.
 ### `GET /catalogos/niveles/`
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Básico", "slug": "basico", "orden": 1 }
-]
+{
+  "count": 4,
+  "next": null,
+  "previous": null,
+  "results": [
+    { "id": 1, "nombre": "Básico", "slug": "basico", "orden": 1 }
+  ]
+}
 ```
 
 ---
@@ -268,9 +304,14 @@ Solo categorías con `activa=true`. Query params: `?search=<texto>`
 
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Tecnología", "slug": "tecnologia", "icono": "laptop", "descripcion": "" }
-]
+{
+  "count": 30,
+  "next": "http://localhost:8000/api/v1/catalogos/categorias/?page=3",
+  "previous": "http://localhost:8000/api/v1/catalogos/categorias/?page=1",
+  "results": [
+    { "id": 1, "nombre": "Tecnología", "slug": "tecnologia", "icono": "laptop", "descripcion": "" }
+  ]
+}
 ```
 
 ---
@@ -280,9 +321,14 @@ Query params: `?search=<texto>`
 
 **200**
 ```json
-[
-  { "id": 1, "nombre": "Python", "slug": "python" }
-]
+{
+  "count": 80,
+  "next": "http://localhost:8000/api/v1/catalogos/tags/?page=3",
+  "previous": "http://localhost:8000/api/v1/catalogos/tags/?page=1",
+  "results": [
+    { "id": 1, "nombre": "Python", "slug": "python" }
+  ]
+}
 ```
 
 ---
@@ -295,7 +341,7 @@ Listado público de programas. Sin autenticación.
 Query params:
 | Param | Tipo | Descripción |
 |---|---|---|
-| `categoria` | int | ID de categoría |
+| `categorias` | int (repetible) | ID de categoría — se puede pasar varias veces: `?categorias=1&categorias=3` |
 | `tipo` | int | ID de tipo de programa |
 | `modalidad` | int | ID de modalidad |
 | `nivel` | int | ID de nivel académico |
@@ -314,7 +360,7 @@ Query params:
     "descripcion_corta": "Aprende Python desde cero.",
     "descripcion": "...",
     "certificadora_id": 1,
-    "categoria_id": 1,
+    "categorias_ids": [1, 2],
     "tipo_id": 1,
     "modalidad_id": 1,
     "nivel_id": 1,
@@ -358,7 +404,7 @@ Crea un programa. Requiere rol `certificadora`.
   "descripcion": "Contenido detallado del curso...",
   "tipo_id": 1,
   "modalidad_id": 1,
-  "categoria_id": 1,
+  "categorias_ids": [1, 2],
   "nivel_id": 1,
   "es_gratuito": false,
   "precio": "299.00",
@@ -374,10 +420,11 @@ Crea un programa. Requiere rol `certificadora`.
   "tags_ids": [1, 2]
 }
 ```
-> Campos opcionales: `categoria_id`, `nivel_id`, `precio`, `moneda_id`, `duracion_horas`, `duracion_semanas`, `descripcion_certificado`, `fecha_inicio`, `fecha_fin`, `url_inscripcion`, `tags_ids`.
+> Campos opcionales: `categorias_ids` (máx 5), `nivel_id`, `precio`, `moneda_id`, `duracion_horas`, `duracion_semanas`, `descripcion_certificado`, `fecha_inicio`, `fecha_fin`, `url_inscripcion`, `tags_ids`.
 
 **201** — Objeto programa creado (misma estructura que el GET).  
-**403** — Certificadora no verificada.
+**403** — Certificadora no verificada.  
+**422** — Se superó el límite de 5 categorías.
 
 ---
 
@@ -390,7 +437,7 @@ Actualiza parcialmente un programa propio. Requiere rol `certificadora`.
   "titulo": "Nuevo título",
   "descripcion_corta": "Nueva descripción corta.",
   "descripcion": "...",
-  "categoria_id": 2,
+  "categorias_ids": [2, 3],
   "nivel_id": 2,
   "es_gratuito": true,
   "precio": null,
@@ -407,7 +454,8 @@ Actualiza parcialmente un programa propio. Requiere rol `certificadora`.
 
 **200** — Objeto programa actualizado.  
 **403** — No es el propietario del programa.  
-**404** — Programa no encontrado.
+**404** — Programa no encontrado.  
+**422** — Se superó el límite de 5 categorías.
 
 ---
 
@@ -423,12 +471,14 @@ Sin payload.
 
 ---
 
-## POSTULACIONES
+## INTERESES
+
+> Representa que un estudiante guardó un programa como favorito (bookmark). El estudiante es redirigido a `url_inscripcion` del programa — no hay postulación directa.
 
 Todos los endpoints requieren rol `estudiante`.
 
-### `GET /postulaciones/`
-Lista las postulaciones del estudiante autenticado.
+### `GET /intereses/`
+Lista los programas guardados del estudiante autenticado.
 
 **200**
 ```json
@@ -437,36 +487,140 @@ Lista las postulaciones del estudiante autenticado.
     "id": 1,
     "estudiante_id": 1,
     "programa_id": 5,
-    "estado_slug": "pendiente",
-    "mensaje": "Estoy interesado en este programa.",
-    "fecha_postulacion": "2025-02-01T14:30:00Z"
+    "fecha_creacion": "2025-02-01T14:30:00Z"
   }
 ]
 ```
 
 ---
 
-### `GET /postulaciones/{id}/`
-Detalle de una postulación propia.
+### `POST /intereses/`
+Guarda un programa como favorito.
 
-**200** — Mismo objeto que un ítem del listado.  
-**403** — La postulación no pertenece al estudiante autenticado.  
-**404** — Postulación no encontrada.
+**Payload**
+```json
+{
+  "programa_id": 5
+}
+```
+
+**201**
+```json
+{
+  "id": 1,
+  "estudiante_id": 1,
+  "programa_id": 5,
+  "fecha_creacion": "2025-02-01T14:30:00Z"
+}
+```
+**409** — El programa ya está guardado.
 
 ---
 
-### `POST /postulaciones/`
-Crea una postulación a un programa.
+### `GET /intereses/{programa_id}/`
+Verifica si el estudiante ya guardó un programa específico.
+
+**200**
+```json
+{ "guardado": true }
+```
+
+---
+
+### `DELETE /intereses/{programa_id}/`
+Quita un programa de guardados (soft delete).
+
+**204** — Sin contenido.  
+**404** — El interés no existe o ya fue eliminado.
+
+---
+
+## RESEÑAS
+
+> Cualquier estudiante autenticado puede reseñar. Una reseña por estudiante por entidad. Los listados son públicos.
+
+### `GET /resenas/programas/`
+Lista las reseñas de un programa. Sin autenticación.
+
+Query params:
+| Param | Tipo | Descripción |
+|---|---|---|
+| `programa_id` | int | **Requerido** — ID del programa a consultar |
+
+**200**
+```json
+[
+  {
+    "id": 1,
+    "estudiante_id": 1,
+    "programa_id": 5,
+    "calificacion": 4,
+    "comentario": "Excelente programa, muy bien estructurado.",
+    "fecha_creacion": "2025-03-10T09:00:00Z"
+  }
+]
+```
+**400** — Falta el parámetro `programa_id`.
+
+---
+
+### `POST /resenas/programas/`
+Crea una reseña de un programa. Requiere rol `estudiante`.
 
 **Payload**
 ```json
 {
   "programa_id": 5,
-  "mensaje": "Estoy interesado en este programa."
+  "calificacion": 4,
+  "comentario": "Excelente programa, muy bien estructurado."
 }
 ```
-> `mensaje` es opcional.
+> `calificacion`: entero entre 1 y 5.
 
-**201** — Objeto postulación creado.  
-**409** — Ya existe una postulación del estudiante a ese programa.  
-**422** — El programa no tiene inscripciones abiertas.
+**201** — Objeto reseña creado (misma estructura que un ítem del listado).  
+**409** — El estudiante ya reseñó este programa.  
+**422** — Calificación fuera del rango permitido (1–5).
+
+---
+
+### `GET /resenas/certificadoras/`
+Lista las reseñas de una certificadora. Sin autenticación.
+
+Query params:
+| Param | Tipo | Descripción |
+|---|---|---|
+| `certificadora_id` | int | **Requerido** — ID del perfil certificadora |
+
+**200**
+```json
+[
+  {
+    "id": 1,
+    "estudiante_id": 1,
+    "certificadora_id": 2,
+    "calificacion": 5,
+    "comentario": "Institución muy confiable.",
+    "fecha_creacion": "2025-03-15T11:00:00Z"
+  }
+]
+```
+**400** — Falta el parámetro `certificadora_id`.
+
+---
+
+### `POST /resenas/certificadoras/`
+Crea una reseña de una certificadora. Requiere rol `estudiante`.
+
+**Payload**
+```json
+{
+  "certificadora_id": 2,
+  "calificacion": 5,
+  "comentario": "Institución muy confiable."
+}
+```
+> `calificacion`: entero entre 1 y 5.
+
+**201** — Objeto reseña creado (misma estructura que un ítem del listado).  
+**409** — El estudiante ya reseñó esta certificadora.  
+**422** — Calificación fuera del rango permitido (1–5).

@@ -1,16 +1,23 @@
+from django.db import transaction, IntegrityError
+
 from apps.resenas.domain.repositories.resena_programa_repository import AbstractResenaProgramaRepository
 from apps.resenas.domain.entities.resena_programa import ResenaProgramaEntity
+from apps.resenas.domain.exceptions import ResenaYaExiste
 
 
 class DjangoResenaProgramaRepository(AbstractResenaProgramaRepository):
+    @transaction.atomic
     def create(self, estudiante_id, programa_id, calificacion, comentario):
         from apps.resenas.infrastructure.models import ResenaPrograma
-        r = ResenaPrograma.objects.create(
-            estudiante_id=estudiante_id,
-            programa_id=programa_id,
-            calificacion=calificacion,
-            comentario=comentario,
-        )
+        try:
+            r = ResenaPrograma.objects.create(
+                estudiante_id=estudiante_id,
+                programa_id=programa_id,
+                calificacion=calificacion,
+                comentario=comentario,
+            )
+        except IntegrityError:
+            raise ResenaYaExiste("Ya tienes una reseña para este programa.")
         return self._to_entity(r)
 
     def list_by_programa(self, programa_id):

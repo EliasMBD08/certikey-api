@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from apps.catalogos.infrastructure.models import (
     Rol, EstadoVerificacion, EstadoPrograma,
-    TipoPrograma, Modalidad, NivelAcademico, Moneda,
+    TipoPrograma, Modalidad, NivelAcademico, Moneda, Categoria,
 )
 
 
@@ -20,6 +20,7 @@ class Command(BaseCommand):
         self._seed_modalidades()
         self._seed_niveles()
         self._seed_monedas()
+        self._seed_categorias()
         self.stdout.write(self.style.SUCCESS('Catálogos iniciales cargados correctamente.'))
 
     def _seed_roles(self):
@@ -90,3 +91,23 @@ class Command(BaseCommand):
         for d in datos:
             Moneda.objects.get_or_create(codigo_iso=d['codigo_iso'], defaults=d)
         self.stdout.write('  ✓ Monedas')
+
+    def _seed_categorias(self):
+        from django.utils.text import slugify
+        datos = [
+            {'nombre': 'Tecnología y Software',     'slug': 'tecnologia-y-software',     'icono': 'pi pi-desktop',       'descripcion': 'Programación, desarrollo de software y herramientas tecnológicas'},
+            {'nombre': 'Ingeniería',                 'slug': 'ingenieria',                'icono': 'pi pi-cog',           'descripcion': 'Disciplinas de ingeniería civil, mecánica, eléctrica y afines'},
+            {'nombre': 'Ciberseguridad',             'slug': 'ciberseguridad',            'icono': 'pi pi-shield',        'descripcion': 'Seguridad informática, hacking ético y protección de datos'},
+            {'nombre': 'Diseño y Multimedia',        'slug': 'diseno-y-multimedia',       'icono': 'pi pi-palette',       'descripcion': 'Diseño gráfico, UX/UI, fotografía y producción audiovisual'},
+            {'nombre': 'Administración y Negocios',  'slug': 'administracion-y-negocios', 'icono': 'pi pi-briefcase',     'descripcion': 'Gestión empresarial, finanzas, marketing y emprendimiento'},
+            {'nombre': 'Educación y Docencia',       'slug': 'educacion-y-docencia',      'icono': 'pi pi-book',          'descripcion': 'Pedagogía, formación docente y metodologías de enseñanza'},
+            {'nombre': 'Salud y Medicina',           'slug': 'salud-y-medicina',          'icono': 'pi pi-heart',         'descripcion': 'Ciencias de la salud, enfermería, nutrición y medicina'},
+            {'nombre': 'Gastronomía',                'slug': 'gastronomia',               'icono': 'pi pi-star',          'descripcion': 'Cocina, pastelería, barismo y artes culinarias'},
+            {'nombre': 'Derecho y Legal',            'slug': 'derecho-y-legal',           'icono': 'pi pi-verified',      'descripcion': 'Ciencias jurídicas, derecho corporativo y legislación'},
+            {'nombre': 'Idiomas',                    'slug': 'idiomas',                   'icono': 'pi pi-globe',         'descripcion': 'Aprendizaje y certificación en lenguas extranjeras'},
+            {'nombre': 'Ciencias Exactas',           'slug': 'ciencias-exactas',          'icono': 'pi pi-calculator',    'descripcion': 'Matemáticas, física, química y estadística'},
+            {'nombre': 'Arte y Humanidades',         'slug': 'arte-y-humanidades',        'icono': 'pi pi-image',         'descripcion': 'Bellas artes, literatura, filosofía y ciencias sociales'},
+        ]
+        for d in datos:
+            Categoria.objects.get_or_create(slug=d['slug'], defaults={**d, 'activa': True})
+        self.stdout.write('  ✓ Categorías')
