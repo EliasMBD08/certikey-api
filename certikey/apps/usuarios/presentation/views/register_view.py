@@ -25,7 +25,7 @@ class RegisterView(APIView):
                     "username": drf_serializers.CharField(),
                     "password": drf_serializers.CharField(),
                     "first_name": drf_serializers.CharField(),
-                    "last_name": drf_serializers.IntegerField()
+                    "last_name": drf_serializers.CharField(),
                 },
             ),
             400: OpenApiResponse(description="Datos inválidos o rol no encontrado"),

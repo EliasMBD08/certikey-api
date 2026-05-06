@@ -41,6 +41,24 @@ class InteresViewSet(ViewSet):
         except InteresYaExiste as e:
             return Response({"detail": str(e)}, status=status.HTTP_409_CONFLICT)
 
+        try:
+            from apps.programas.infrastructure.models import Programa
+            from apps.shared.infrastructure.adapters.http_notification_adapter import HttpNotificationAdapter
+            from apps.shared.domain.ports.notification_port import InteresNotificationDTO
+
+            programa = Programa.objects.select_related('certificadora__usuario').get(id=interes.programa_id)
+            usuario = request.user
+            nombre_estudiante = f"{usuario.first_name} {usuario.last_name}".strip() or usuario.username
+            HttpNotificationAdapter().notify_interes(InteresNotificationDTO(
+                email_certificadora=programa.certificadora.usuario.email,
+                nombre_institucion=programa.certificadora.nombre_institucion,
+                nombre_estudiante=nombre_estudiante,
+                titulo_programa=programa.titulo,
+                programa_id=programa.id,
+            ))
+        except Exception:
+            pass
+
         return Response(asdict(interes), status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):

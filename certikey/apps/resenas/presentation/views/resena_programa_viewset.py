@@ -51,4 +51,24 @@ class ResenaProgramaViewSet(ViewSet):
         except CalificacionInvalida as e:
             return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
+        try:
+            from apps.programas.infrastructure.models import Programa
+            from apps.shared.infrastructure.adapters.http_notification_adapter import HttpNotificationAdapter
+            from apps.shared.domain.ports.notification_port import ResenaNotificationDTO
+
+            programa = Programa.objects.select_related('certificadora__usuario').get(id=resena.programa_id)
+            usuario = request.user
+            nombre_estudiante = f"{usuario.first_name} {usuario.last_name}".strip() or usuario.username
+            HttpNotificationAdapter().notify_resena(ResenaNotificationDTO(
+                email_certificadora=programa.certificadora.usuario.email,
+                nombre_institucion=programa.certificadora.nombre_institucion,
+                nombre_estudiante=nombre_estudiante,
+                titulo_programa=programa.titulo,
+                programa_id=programa.id,
+                calificacion=resena.calificacion,
+                comentario=resena.comentario,
+            ))
+        except Exception:
+            pass
+
         return Response(asdict(resena), status=status.HTTP_201_CREATED)

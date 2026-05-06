@@ -73,6 +73,8 @@ class ProgramaViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
 
         perfil = request.user.perfil_certificadora
+        programa_antes = GetProgramaUseCase(_repo()).execute(int(pk))
+
         input_dto = UpdateProgramaInput(
             programa_id=int(pk),
             certificadora_id=perfil.id,
@@ -86,6 +88,31 @@ class ProgramaViewSet(ViewSet):
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
         except CategoriasExcedidas as e:
             return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        activado_gratuito = (
+            not programa_antes.es_gratuito
+            and programa.es_gratuito
+            and programa.otorga_certificado
+        )
+        if activado_gratuito:
+            try:
+                from apps.intereses.infrastructure.models import Interes
+                from apps.shared.infrastructure.adapters.http_notification_adapter import HttpNotificationAdapter
+                from apps.shared.domain.ports.notification_port import ProgramaGratuitoNotificationDTO
+
+                emails = list(
+                    Interes.objects.filter(programa_id=programa.id)
+                    .select_related('estudiante__usuario')
+                    .values_list('estudiante__usuario__email', flat=True)
+                )
+                if emails:
+                    HttpNotificationAdapter().notify_programa_gratuito(ProgramaGratuitoNotificationDTO(
+                        titulo_programa=programa.titulo,
+                        programa_id=programa.id,
+                        emails_estudiantes=emails,
+                    ))
+            except Exception:
+                pass
 
         return Response(asdict(programa))
 

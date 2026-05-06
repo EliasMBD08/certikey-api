@@ -1,4 +1,5 @@
 from django.db import transaction, IntegrityError
+import logging
 
 from apps.usuarios.domain.repositories.user_repository import AbstractUserRepository
 from apps.usuarios.domain.entities.user import UserEntity
@@ -6,6 +7,7 @@ from apps.usuarios.domain.entities.perfil_estudiante import PerfilEstudianteEnti
 from apps.usuarios.domain.entities.perfil_certificadora import PerfilCertificadoraEntity
 from apps.usuarios.domain.exceptions import RolNotFound, InvalidRole, UserNotFound, PerfilNotFound, EmailAlreadyExists
 
+logger = logging.getLogger(__name__)
 
 class DjangoUserRepository(AbstractUserRepository):
     @transaction.atomic
@@ -30,7 +32,8 @@ class DjangoUserRepository(AbstractUserRepository):
                 last_name=last_name,
                 rol=rol,
             )
-        except IntegrityError:
+        except IntegrityError as error:
+            logger.error(f'Error al crear usuario {error}')
             raise EmailAlreadyExists(f"El email '{email}' ya está registrado.")
         return self._user_to_entity(user)
 

@@ -54,7 +54,7 @@ class PerfilCertificadora(ModeloBase):
         Usuario, on_delete=models.CASCADE, related_name="perfil_certificadora"
     )
     nombre_institucion = models.CharField(max_length=255)
-    ruc = models.CharField(max_length=20, unique=True, blank=True)
+    ruc = models.CharField(max_length=20, unique=True, null=True, blank=True, default=None)
     descripcion = models.TextField(blank=True)
     logo = models.ImageField(upload_to="logos/", null=True, blank=True)
     sitio_web = models.URLField(blank=True)

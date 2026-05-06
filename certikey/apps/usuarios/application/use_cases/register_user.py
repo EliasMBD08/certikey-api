@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from apps.usuarios.domain.repositories.user_repository import AbstractUserRepository
 from apps.usuarios.domain.exceptions import EmailAlreadyExists
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -27,8 +30,10 @@ class RegisterUserUseCase:
 
     def execute(self, input_dto: RegisterUserInput) -> RegisterUserOutput:
         if self._repo.email_exists(input_dto.email):
+            logger.error(f'El email {input_dto.email} ya está registrado. Validacion.')
             raise EmailAlreadyExists(f"El email '{input_dto.email}' ya está registrado.")
 
+        logger.info(f'Creando usuario {input_dto.email}.')
         user = self._repo.create(
             email=input_dto.email,
             username=input_dto.username,
@@ -37,4 +42,6 @@ class RegisterUserUseCase:
             last_name=input_dto.last_name,
             rol_slug=input_dto.rol_slug,
         )
+
+        logger.info(f'Usuario {user.email} creado exitosamente.')
         return RegisterUserOutput(id=user.id, email=user.email, username=user.username, rol_slug=user.rol_slug)
