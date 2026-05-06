@@ -3,6 +3,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
 
 from apps.programas.application.use_cases.create_programa import CreateProgramaUseCase, CreateProgramaInput
@@ -40,7 +41,13 @@ class ProgramaViewSet(ViewSet):
             'search': request.query_params.get('search'),
         }
         programas = ListProgramasUseCase(_repo()).execute(filters)
-        return Response([asdict(p) for p in programas])
+        data = [asdict(p) for p in programas]
+
+        paginator = PageNumberPagination()
+        page = paginator.paginate_queryset(data, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
+        return Response(data)
 
     def retrieve(self, request, pk=None):
         try:
@@ -115,6 +122,18 @@ class ProgramaViewSet(ViewSet):
                 pass
 
         return Response(asdict(programa))
+
+    @action(detail=False, methods=['get'], url_path='mis-programas')
+    def mis_programas(self, request):
+        perfil = request.user.perfil_certificadora
+        programas = _repo().list_by_certificadora(perfil.id)
+        data = [asdict(p) for p in programas]
+
+        paginator = PageNumberPagination()
+        page = paginator.paginate_queryset(data, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
+        return Response(data)
 
     @action(detail=True, methods=['post'], url_path='publicar')
     def publicar(self, request, pk=None):
